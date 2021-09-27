@@ -1,5 +1,8 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
+from logicaIntegracion.DBConsulta import DBConsulta
+
 
 class FrameOrder(Tk):
 
@@ -25,14 +28,32 @@ class FrameOrder(Tk):
         labelCategoria = Label(initframe, text="Categoría:",bg='#BDC3C7',fg='#454545')
         labelCategoria.config(font=("Courier", 11,'bold'))
         labelCategoria.place(x=20, y=50)
-                 
- 
+                  
         radioCategoria = IntVar()
+        precioTotal = IntVar()
 
+        ## Enlistamos los elementos que componen el selector de productos
+        labelProducto = Label(initframe, text="Producto:",bg='#BDC3C7',fg='#454545')
+        labelProducto.config(font=("Courier", 11,'bold'))
+        labelProducto.place(x=215, y=50)
+
+        listboxProductos = Listbox(initframe,width=22,height=9)
+        
         ## Función para filtrar los productos según la categoría seleccionada
         def filtrarCategoria():
-            print(radioCategoria.get())
-        ## Función para filtrar los productos según la categoría seleccionada
+
+            listboxProductos.delete(0, 'end')
+            
+            listaProductos = DBConsulta.obtenerProductosCategoria(self,radioCategoria.get())
+
+            for i in range(len(listaProductos)):
+                listboxProductos.insert(listaProductos[i][0], listaProductos[i][1])
+                    
+        ## Función para filtrar los productos según la categoría seleccionada       
+
+        listboxProductos.place(x=215, y=75)
+
+        ## Enlistamos los elementos que componen el selector de productos
 
         rdioArroz = Radiobutton(initframe, text='Arroz',fg='#454545', command=filtrarCategoria,
                                     variable=radioCategoria, value=1,bg='#BDC3C7',highlightthickness=0).place(x=20, y=70) 
@@ -50,38 +71,67 @@ class FrameOrder(Tk):
                                     variable=radioCategoria, value=7,bg='#BDC3C7',highlightthickness=0).place(x=20, y=220)
         rdioCombos = Radiobutton(initframe, text='Combos',fg='#454545', command=filtrarCategoria,
                                     variable=radioCategoria, value=8,bg='#BDC3C7',highlightthickness=0).place(x=20, y=245)
-        ## Enlistamos los elementos que componen los radio button de categoría
+        ## Enlistamos los elementos que componen los radio button de categoría 
 
-        ## Enlistamos los elementos que componen el selector de productos
-        labelProducto = Label(initframe, text="Producto:",bg='#BDC3C7',fg='#454545')
-        labelProducto.config(font=("Courier", 11,'bold'))
-        labelProducto.place(x=215, y=50)
-
-        listboxProductos = Listbox(initframe,width=22,height=9)
-        listboxProductos.insert(1, "Python")
-        listboxProductos.insert(2, "Perl")
-        listboxProductos.insert(3, "C")
-        listboxProductos.insert(4, "PHP")
-        listboxProductos.insert(5, "JSP")
-        listboxProductos.insert(6, "Ruby")
-        listboxProductos.insert(7, "PHP")
-        listboxProductos.insert(8, "JSP")
-        listboxProductos.insert(9, "Ruby")
-        listboxProductos.place(x=215, y=75)
-        ## Enlistamos los elementos que componen el selector de productos
+        
+        ## TABLA PARA VISUALIZAR LOS PRODUCTOS DE LA ORDEN
+        tablaOrden = ttk.Treeview(initframe, column=("Cantidad", "Producto", "Total"), show='headings', height=5)
+        tablaOrden.column("# 1", anchor=CENTER, width=70)
+        tablaOrden.heading("# 1", text="Cantidad")
+        tablaOrden.column("# 2", anchor=CENTER, width=190)
+        tablaOrden.heading("# 2", text="Producto")
+        tablaOrden.column("# 3", anchor=CENTER, width=100)
+        tablaOrden.heading("# 3", text="Precio")      
+        tablaOrden.place(x=30, y=330)
 
         ## BOTONES PARA AGREGAR, DESAGREGAR Y LIMPIAR PRODUCTOS A UNA ORDEN ##
         
-        buttonAdd = Button(initframe, width=11,height=1, bg='#229954', bd=0,highlightbackground="#454545",borderwidth=0,text="Añadir...",command=agregarProducto)
+        ## Inicializamos función para agregar un producto a la lista
+        def agregarProducto():
+            
+            productoSeleccionado = " "
+            
+            for i in listboxProductos.curselection():
+                productoSeleccionado = DBConsulta.informacionProducto(self,listboxProductos.get(i))
+
+            tablaOrden.insert('', 'end', text="1", values=('1', productoSeleccionado[1], productoSeleccionado[2]))
+
+            
+            precioTotal.set(precioTotal.get() + int(productoSeleccionado[2]))
+            
+        buttonAdd = Button(initframe, width=11,height=1, bg='#229954', bd=0,highlightbackground="#229954",borderwidth=0,text="Añadir...",command=agregarProducto)
         buttonAdd.place(x=30, y=280)
 
-        buttonRemove = Button(initframe, width=11,height=1, bg='#A93226', bd=0,highlightbackground="#454545",borderwidth=0, text="Eliminar..",command=eliminarProducto)
+        
+        buttonRemove = Button(initframe, width=11,height=1, bg='#A93226', bd=0,highlightbackground="#A93226",borderwidth=0, text="Eliminar..",command=eliminarProducto)
         buttonRemove.place(x=155, y=280)
 
-        buttonClean = Button(initframe, width=11,height=1, bg='#2E86C1', bd=0,highlightbackground="#454545",borderwidth=0, text="Limpiar..",command=limpiarOrden)
+
+        ## Inicializamos función para limpiar la orden total
+        def limpiarOrden():
+       
+            confirmacion = messagebox.askyesnocancel(message="¿Está seguro de limpiar la orden?", title="Limpiar Orden")
+            
+            if(confirmacion == True):
+                for item in tablaOrden.get_children():
+                    tablaOrden.delete(item)
+
+                precioTotal.set(0)
+
+        buttonClean = Button(initframe, width=11,height=1, bg='#2E86C1', bd=0,highlightbackground="#2E86C1",borderwidth=0, text="Limpiar..",command=limpiarOrden)
         buttonClean.place(x=281, y=280)
         
-        ## BOTONES PARA AGREGAR, DESAGREGAR Y LIMPIAR PRODUCTOS A UNA ORDEN ##
+        ## BOTONES PARA AGREGAR, DESAGREGAR, LIMPIAR PRODUCTOS A UNA ORDEN ##
+
+        labelPrecioOrden = Label(initframe, text="Total:",bg='#BDC3C7',fg='#1B4F72')
+        labelPrecioOrden.config(font=("Courier", 14,'bold'))
+        labelPrecioOrden.place(x=30, y=465)
+
+        campoPrecioOrden = ttk.Entry(initframe,width=8,state='readonly',textvariable = precioTotal)
+        campoPrecioOrden.place(x=105, y=463)
+
+        buttonGenerar = Button(initframe, width=20,height=1, bg='#2E86C1', bd=0,highlightbackground="#2E86C1",borderwidth=0, text="Generar Orden...")
+        buttonGenerar.place(x=206, y=463)
     
 
 if __name__ == "__main__":
@@ -91,15 +141,7 @@ if __name__ == "__main__":
 
 
 
-## Inicializamos función para agregar un producto a la lista
-def agregarProducto():
-    print("nano")
-
-
 ## Inicializamos función para eliminar un producto a la lista
 def eliminarProducto():
     print("nano")
 
-## Inicializamos función para limpiar la orden total
-def limpiarOrden():
-    print("nano")

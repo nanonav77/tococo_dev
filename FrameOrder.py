@@ -13,7 +13,7 @@ class FrameOrder(Tk):
 
     def initialize(self):
         initframe = Frame(self, bg='#BDC3C7',width=420,height=500)
-        initframe.place(x=280, y=105) 
+        initframe.place(x=200, y=91) 
 
         ## Indicamos la etiqueta inicial de número de orden        
         varOrder   = StringVar() 
@@ -95,7 +95,6 @@ class FrameOrder(Tk):
                 productoSeleccionado = DBConsulta.informacionProducto(self,listboxProductos.get(i))
 
             tablaOrden.insert('', 'end', text="1", values=('1', productoSeleccionado[1], productoSeleccionado[2]))
-
             
             precioTotal.set(precioTotal.get() + int(productoSeleccionado[2]))
             

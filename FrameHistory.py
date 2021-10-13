@@ -20,14 +20,17 @@ class FrameHistory(Tk):
         varHistory.set('Historial de Ordenes')
         ## Indicamos la etiqueta inicial de número de orden 
         
-        buttonRefrescar = Button(initframe, width=3,height=1, bg='#2E86C1', bd=0,highlightbackground="#2E86C1",borderwidth=0)
-        buttonRefrescar.place(x=18, y=74)
+        buttonPagar = Button(initframe, width=3,height=1, bg='#229954', bd=0,highlightbackground="#229954",borderwidth=0)
+        buttonPagar.place(x=18, y=74)
 
-        buttonExportarExcel = Button(initframe, width=20,height=1, bg='#2E86C1', bd=0,highlightbackground="#2E86C1",borderwidth=0, text="Exportar a Excel...")
+        buttonExportarExcel = Button(initframe, width=20,height=1, bg='#229954', bd=0,highlightbackground="#229954",borderwidth=0, text="Exportar a Excel...")
         buttonExportarExcel.place(x=71, y=74)
 
         buttonBuscarOrden = Button(initframe, width=12,height=1, bg='#2E86C1', bd=0,highlightbackground="#2E86C1",borderwidth=0, text="Buscar Orden...")
-        buttonBuscarOrden.place(x=260, y=74)        
+        buttonBuscarOrden.place(x=260, y=74)
+
+        buttonEliminarOrden = Button(initframe, width=16,height=1, bg='#A93226', bd=0,highlightbackground="#A93226",borderwidth=0, text="Eliminar Orden...")
+        buttonEliminarOrden.place(x=387, y=74)         
 
         ## TABLA PARA VISUALIZAR EL HISTORIAL DE LAS ÓRDENES
         tablaHistorial = ttk.Treeview(initframe, column=("N°","Cliente", "Fecha", "Total","Estado"), show='headings', height=18)

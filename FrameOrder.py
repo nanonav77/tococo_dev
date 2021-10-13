@@ -37,6 +37,13 @@ class FrameOrder(Tk):
         labelProducto.config(font=("Courier", 11,'bold'))
         labelProducto.place(x=215, y=50)
 
+        ## Creamos el Combobox de Cantidad de un Producto Determinado
+        comboQProductos = ttk.Combobox(initframe, width=8, height=5,
+                            values=[1,2,3,4,5,6,7,8,9,10])
+
+        comboQProductos.place(x=315, y=46)
+        comboQProductos.current(0)
+
         listboxProductos = Listbox(initframe,width=22,height=9)
         
         ## Función para filtrar los productos según la categoría seleccionada
@@ -94,9 +101,11 @@ class FrameOrder(Tk):
             for i in listboxProductos.curselection():
                 productoSeleccionado = DBConsulta.informacionProducto(self,listboxProductos.get(i))
 
-            tablaOrden.insert('', 'end', text="1", values=('1', productoSeleccionado[1], productoSeleccionado[2]))
-            
-            precioTotal.set(precioTotal.get() + int(productoSeleccionado[2]))
+            precioProducto = int(productoSeleccionado[2]) * int(comboQProductos.get())
+           
+            tablaOrden.insert('', 'end', text="1", values=(str(comboQProductos.get()), productoSeleccionado[1], str(precioProducto)))
+                        
+            precioTotal.set(precioTotal.get() + precioProducto)
             
         buttonAdd = Button(initframe, width=11,height=1, bg='#229954', bd=0,highlightbackground="#229954",borderwidth=0,text="Añadir...",command=agregarProducto)
         buttonAdd.place(x=30, y=280)
